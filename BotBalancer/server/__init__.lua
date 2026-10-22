@@ -204,6 +204,9 @@ EventManager.Listen("Level:Loaded", function(levelName, gameModeId)
 
     -- Enable built-in team shuffling
     kyberSettings.enableShuffleTeams = true
+
+    -- Enable afk kick
+    wsSettings.noInteractivityTimeoutTime = 60 * 5
 end)
 
 -- Finds the best fit team by looking at both team player counts
@@ -222,10 +225,7 @@ function balancePlayer(player)
     print(string.format("Balanced player '%s' to team %d.", player.name, player.team))
 end
 
-
--- This event is triggered when a player joins the server.
--- We will determine the best team to set them to here
-EventManager.Listen("Server:PlayerJoined", function(player)
+function onPlayerJoin(player)
     if player == nil then
         print("Given invalid player on Server:PlayerJoined")
         return
@@ -238,7 +238,11 @@ EventManager.Listen("Server:PlayerJoined", function(player)
     end
 
     balancePlayer(player)
-end)
+end
+
+-- This event is triggered when a player joins the server.
+-- We will determine the best team to set them to here
+EventManager.Listen("ServerPlayer:Joined", onPlayerJoin)
 
 -- Deprecated: Team shuffling
 -- Kyber now has a built-in shuffle teams feature that accounts for parties/squads
